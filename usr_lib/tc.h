@@ -165,6 +165,7 @@ typedef struct {
 #define	TC6_REG ((TC_16bit_t *)0x42003800)
 #define TC7_REG ((TC_16bit_t *)0x42003C00)
 
+//Modes for TC
 #define NFRQ	0x0
 #define MFRQ	0x1
 #define NPWM	0x2

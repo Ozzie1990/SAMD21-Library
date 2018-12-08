@@ -32,6 +32,8 @@ typedef struct {
 
 rfl_ovn_status_t rfl_ovn_status;
 
+uint16_t rfl_ovn_time;
+
 //UART Commands
 #define REFLOW_OVEN_STATUS_CMD		0x00
 #define REFLOW_OVEN_START_CMD		0x01
@@ -46,7 +48,11 @@ static char REFLOW_OVEN_COMMANDS[][3] = {"STS","STR","STP","TMP"};
 #define REFLOW_OVEN_ZONE_1		0x0139	//25C			:Initial
 #define REFLOW_OVEN_ZONE_2		0x0735	//150C			:90s stable
 #define REFLOW_OVEN_ZONE_3		0x0C35  //245C ~ 250C	:30s stable 
-#define REFLOW_OVEN_ZONE_4		0x0177  //30C			
+#define REFLOW_OVEN_ZONE_4		0x0177  //30C	
+
+//Time constants for zone 2 and 3
+#define REFLOW_OVEN_ZONE_2_TIME 90	//seconds
+#define REFLOW_OVEN_ZONE_3_TIME 30	//seconds
 
 #define REFLOW_OVEN_MESSAGE_WELCOME			"Welcome Ozzie\r\n\r\n"
 #define REFLOW_OVEN_MESSAGE_INIT_START		"Initialization process starting...\r\n\r\n"
@@ -79,5 +85,6 @@ void reflow_oven_stop_profile();
 int reflow_oven_get_temperature();
 void reflow_oven_set(int on);
 void reflow_oven_check_user_input();
+void reflow_oven_timer();
 
 #endif /* REFLOW_OVEN_H_ */

@@ -16,6 +16,7 @@ void reflow_oven_init(int uart_enable) {
 		uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_INIT_START);
 		uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_INIT_RELAY);
 	}
+
 	
 	gpio_set_dir(PORTB_REG, PIN7, DIROUT);	//Set relay GPIO port
 	
@@ -97,18 +98,23 @@ void reflow_oven_start_profile(int uart_enable) {
 		
 	/*****************ZONE 2**********************/
 	reflow_oven_set(0);
+	//TODO: Enable Timer
 	
 	if(uart_enable) {
 		uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_PROFILE_ZONE2);
 	}
-	
+
 	//TODO: Add counter for 90s
+	while(rfl_ovn_time < REFLOW_OVEN_ZONE_2_TIME) { /**WAIT**/ }
+	rfl_ovn_time = 0;
+	//TODO: Disable Timer
 	
 	/*****************ZONE 2 END*******************/
 	
 	
 	/*****************ZONE 3**********************/
 	reflow_oven_set(1);
+	//TODO: Enable Timer
 	
 	if(uart_enable) {
 		uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_PROFILE_ZONE3);
@@ -119,7 +125,10 @@ void reflow_oven_start_profile(int uart_enable) {
 	reflow_oven_set(1);	//Turn off to keep at temperature
 	
 	//TODO: Add counter for 30s
-	
+	while(rfl_ovn_time < REFLOW_OVEN_ZONE_3_TIME) { /**WAIT**/ }
+	rfl_ovn_time = 0;
+	//TODO: Disable Timer
+
 	/*****************ZONE 3 END*******************/
 	
 	
@@ -193,4 +202,11 @@ void reflow_oven_cmd_decoder(char data[]) {
 			return;
 		}
 	}
+}
+
+//Timer interrupt handler
+//Used to increment timer integer
+//Implement in main.c file
+void reflow_oven_timer() {
+	rfl_ovn_time += 1;
 }

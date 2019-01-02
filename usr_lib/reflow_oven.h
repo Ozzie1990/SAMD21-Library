@@ -86,5 +86,6 @@ int reflow_oven_get_temperature();
 void reflow_oven_set(int on);
 void reflow_oven_check_user_input();
 void reflow_oven_timer();
+void reflow_oven_set_timer() 
 
 #endif /* REFLOW_OVEN_H_ */

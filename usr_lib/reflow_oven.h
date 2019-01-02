@@ -32,7 +32,7 @@ typedef struct {
 
 rfl_ovn_status_t rfl_ovn_status;
 
-uint16_t rfl_ovn_time;
+volatile uint16_t rfl_ovn_time;
 
 //UART Commands
 #define REFLOW_OVEN_STATUS_CMD		0x00
@@ -86,6 +86,6 @@ int reflow_oven_get_temperature();
 void reflow_oven_set(int on);
 void reflow_oven_check_user_input();
 void reflow_oven_timer();
-void reflow_oven_set_timer() 
+void reflow_oven_set_timer();
 
 #endif /* REFLOW_OVEN_H_ */

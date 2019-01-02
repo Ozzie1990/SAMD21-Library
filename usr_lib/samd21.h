@@ -20,6 +20,9 @@
 #define HIGH	1
 #define LOW		0
 
+#define ON		1
+#define OFF   	0
+
 #define PIN0	(1<<0)
 #define PIN1	(1<<1)
 #define PIN2	(1<<2)

@@ -172,5 +172,6 @@ typedef struct {
 #define MPWM	0x3
 
 void tc_init(int tc, int clk_src, int mode, uint16_t cc0);
+void tc_set_timer(int seconds);
 
 #endif /* TC_H_ */

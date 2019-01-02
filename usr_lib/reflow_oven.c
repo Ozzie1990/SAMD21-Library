@@ -28,6 +28,7 @@ void reflow_oven_init(int uart_enable) {
 	adc_init(GCLK0, 0, 0x08);	//Initialize ADC 
 	
 	//TODO: Start a timer for counting
+	reflow_oven_set_timer();
 	rfl_ovn_status.State = IDLE;
 	rfl_ovn_status.Temp = 0x00;
 	
@@ -84,7 +85,7 @@ uint16_t reflow_oven_read_temp() {
 void reflow_oven_start_profile(int uart_enable) {
 	
 	/*****************ZONE 1**********************/
-	reflow_oven_set(1);	
+	reflow_oven_set(ON);	
 	
 	if(uart_enable) {
 		uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_START_PROFILE);
@@ -97,7 +98,7 @@ void reflow_oven_start_profile(int uart_enable) {
 		
 		
 	/*****************ZONE 2**********************/
-	reflow_oven_set(0);
+	reflow_oven_set(OFF);
 	//TODO: Enable Timer
 	
 	if(uart_enable) {
@@ -113,7 +114,7 @@ void reflow_oven_start_profile(int uart_enable) {
 	
 	
 	/*****************ZONE 3**********************/
-	reflow_oven_set(1);
+	reflow_oven_set(ON);
 	//TODO: Enable Timer
 	
 	if(uart_enable) {
@@ -122,7 +123,7 @@ void reflow_oven_start_profile(int uart_enable) {
 	
 	while(adc_read() <= REFLOW_OVEN_ZONE_3) { /**WAIT**/ }
 	
-	reflow_oven_set(1);	//Turn off to keep at temperature
+	reflow_oven_set(OFF);	//Turn off to keep at temperature
 	
 	//TODO: Add counter for 30s
 	while(rfl_ovn_time < REFLOW_OVEN_ZONE_3_TIME) { /**WAIT**/ }
@@ -209,4 +210,8 @@ void reflow_oven_cmd_decoder(char data[]) {
 //Implement in main.c file
 void reflow_oven_timer() {
 	rfl_ovn_time += 1;
+}
+
+void reflow_oven_set_timer() {
+	tc_init(TC3, GCLK0, MFRQ, 0xC350) //50,000 timer
 }

@@ -28,7 +28,9 @@ void reflow_oven_init(int uart_enable) {
 	adc_init(GCLK0, 0, 0x08);	//Initialize ADC 
 	
 	//TODO: Start a timer for counting
+
 	reflow_oven_set_timer();
+  
 	rfl_ovn_status.State = IDLE;
 	rfl_ovn_status.Temp = 0x00;
 	
@@ -135,7 +137,7 @@ void reflow_oven_start_profile(int uart_enable) {
 	
 	/*****************ZONE 4**********************/
 	//Start zone 4, turn off the oven and open it to cool off
-	reflow_oven_set(0);
+	reflow_oven_set(OFF);
 	
 	if(uart_enable) {
 		uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_PROFILE_ZONE4);
@@ -213,5 +215,6 @@ void reflow_oven_timer() {
 }
 
 void reflow_oven_set_timer() {
+
 	tc_init(TC3, GCLK0, MFRQ, 0xC350) //50,000 timer
 }

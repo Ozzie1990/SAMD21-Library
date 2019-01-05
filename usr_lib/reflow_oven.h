@@ -33,6 +33,7 @@ typedef struct {
 rfl_ovn_status_t rfl_ovn_status;
 
 volatile uint16_t rfl_ovn_time;
+volatile uint16_t rfl_ovn_time_tmp;
 
 //UART Commands
 #define REFLOW_OVEN_STATUS_CMD		0x00

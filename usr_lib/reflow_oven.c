@@ -211,10 +211,16 @@ void reflow_oven_cmd_decoder(char data[]) {
 //Used to increment timer integer
 //Implement in main.c file
 void reflow_oven_timer() {
-	rfl_ovn_time += 1;
+
+	if(rfl_ovn_time_tmp >= 19) {	//Assuming 1MHz clock, if not then change!
+		rfl_ovn_time += 1;
+		rfl_ovn_time_tmp = 0;
+	} else {
+		rfl_ovn_time_tmp += 1;
+	}
 }
 
 void reflow_oven_set_timer() {
 
-	tc_init(TC3, GCLK0, MFRQ, 0xC350) //50,000 timer
+	tc_init(TC3, GCLK0, MFRQ, 0xC350) //50,000 timer (1 second = 20 counts if FCLK = 1MHz)
 }

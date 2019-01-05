@@ -42,6 +42,8 @@ void reflow_oven_init(int uart_enable) {
 	if(uart_enable) {	//TODO REVERSE LATER, CHANGED FOR DEBUGGING
 		reflow_oven_start_profile(0);
 	}
+
+	//Add code for LED initialization
 }
 
 void reflow_oven_send_command(uint8_t cmd) {

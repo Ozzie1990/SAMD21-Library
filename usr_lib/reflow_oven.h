@@ -55,7 +55,7 @@ static char REFLOW_OVEN_COMMANDS[][3] = {"STS","STR","STP","TMP"};
 #define REFLOW_OVEN_ZONE_2_TIME 90	//seconds
 #define REFLOW_OVEN_ZONE_3_TIME 30	//seconds
 
-#define REFLOW_OVEN_MESSAGE_WELCOME			"Welcome Ozzie\r\n\r\n"
+#define REFLOW_OVEN_MESSAGE_WELCOME			"Welcome to Easy Reflow\nVersion 1.00\r\n\r\n"
 #define REFLOW_OVEN_MESSAGE_INIT_START		"Initialization process starting...\r\n\r\n"
 #define REFLOW_OVEN_MESSAGE_INIT_ADC		"Initializing ADC.\r\n"
 #define REFLOW_OVEN_MESSAGE_INIT_RELAY		"Initializing relay control.\r\n"

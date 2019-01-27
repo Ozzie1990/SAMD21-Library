@@ -93,19 +93,21 @@ int drone_plant_x_output;
 int drone_plant_y_output;
 
 
-void initialize_drone();
-void drone_auto_stabilizer();
+/**Primary Functions**/
+
+void initialize_drone();    
+void drone_auto_stabilizer();   //Test code
 void setMotor1Speed(uint16_t speed);
 void setMotor2Speed(uint16_t speed);
 void setMotor3Speed(uint16_t speed);
 void setMotor4Speed(uint16_t speed);
-void drone_auto_stabilizer();
+
 void updateMotors();
 void resetMotorSpeed();
 int diff_accel(int diff_in);
 int int_accel(int int_in);
 int PID_Handler(int diffGain, int intGain, int propGain, int PID_In);
-void drone_x_system(int input);
+void drone_x_system(int input); 
 void drone_y_system(int input);
 int plant(int axis, int input);
 int setPlant(int axis, int pidInput, int diffGain, int intGain, int propGain);

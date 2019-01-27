@@ -9,6 +9,8 @@
 
 void reflow_oven_init(int uart_enable) {
 	uart_quick_en();	//Enable UART for communication
+
+	//TODO: Change system to read from pin to verify if it's in UART mode or not rather than rely on a function call
 	
 	//Messages
 	if(uart_enable) {

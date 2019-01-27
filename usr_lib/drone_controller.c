@@ -3,6 +3,12 @@
  *
  * Created: 9/3/2017 3:07:45 PM
  *  Author: Ozzie
+ * 
+ * Directions:  To use the code you need to initialize the drone via initialize_drone()
+ * 				Modify the PID gains defined in function mentioned above as needed.
+ * 				
+ * 				Currently the code only stabilizes.  Need to add features for moving in various directions
+ * 				and taking in user input.
  */ 
 
 #include "drone_controller.h"
@@ -37,14 +43,14 @@ void initialize_drone() {
 	motor4Speed = 0xFFFF;
 
 	//PID X Gain
-	pidXDiffGain = 0;
-	pidXIntGain = 0;
-	pidXPropGain = 0;
+	pidXDiffGain = 1;
+	pidXIntGain = 1;
+	pidXPropGain = 1;
 
 	//PID Y Gain
-	pidYDiffGain = 0;
-	pidYIntGain = 0;
-	pidYPropGain = 0;
+	pidYDiffGain = 1;
+	pidYIntGain = 1;
+	pidYPropGain = 1;
 
 	//PID Z Gain
 	pidZDiffGain = 0;
@@ -166,7 +172,7 @@ int PID_Handler(int diffGain, int intGain, int propGain, int PID_In) {
 ***************************************************/
 void drone_x_system(int input) {
 	int systemInput = input - drone_plant_x_output;
-	drone_plant_x_output = setPlant(X_AXIS, systemInput, 1, 1, 1);
+	drone_plant_x_output = setPlant(X_AXIS, systemInput, pidXDiffGain, pidXIntGain, pidXPropGain);
 }
 
 /**************************************************
@@ -178,7 +184,7 @@ void drone_x_system(int input) {
 ***************************************************/
 void drone_y_system(int input) {
 	int systemInput = input - drone_plant_y_output;
-	drone_plant_y_output = setPlant(Y_AXIS, systemInput, 1, 1, 1);
+	drone_plant_y_output = setPlant(Y_AXIS, systemInput, pidYDiffGain, pidYIntGain, pidYPropGain);
 }
 
 /**************************************************

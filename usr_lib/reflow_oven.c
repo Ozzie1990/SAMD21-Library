@@ -7,8 +7,20 @@
 
 #include "reflow_oven.h"
 
+/*
+ * Function:  reflow_oven_init
+ * -------------------------------------
+ *  initializatizes the reflow oven by setting the GPIO, uart (if enabled), ADC and timer
+ *
+ *  uart_enable: set to 1 if uart will be used, otherwise will not use
+ *
+ *  returns: null
+ */
 void reflow_oven_init(int uart_enable) {
-	uart_quick_en();	//Enable UART for communication
+
+	if(uart_enable) {
+		uart_quick_en();//Enable UART for communication
+	}	
 
 	//TODO: Change system to read from pin to verify if it's in UART mode or not rather than rely on a function call
 	
@@ -48,6 +60,15 @@ void reflow_oven_init(int uart_enable) {
 	//Add code for LED initialization
 }
 
+/*
+ * Function:  rerflow_oven_send_command
+ * -------------------------------------
+ *  Command decoder
+ *
+ *  cmd: command that will be decoded
+ *
+ *  returns: null
+ */
 void reflow_oven_send_command(uint8_t cmd) {
 	
 	switch(cmd) {

@@ -9,10 +9,14 @@
 
 /*
  * Function:  reflow_oven_init
- * -------------------------------------
- *  initializatizes the reflow oven by setting the GPIO, uart (if enabled), ADC and timer
+ * --------------------
+ * initalizes the reflow oven by 
+ * 1) Setting UART (if inputed)
+ * 2) Setting the GPIO
+ * 3) Setting the timer
+ * 4) Setting the ADC
  *
- *  uart_enable: set to 1 if uart will be used, otherwise will not use
+ *  uart_enable: 0 - uart disabled, 1 - uart enabled
  *
  *  returns: null
  */

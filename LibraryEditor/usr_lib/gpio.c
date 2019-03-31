@@ -77,6 +77,13 @@ void gpio_mux_disable(PORT_REG * port, int pin) {
 	port->PINCFG[pin].bits.PMUXEN = 0;
 }
 
+int gpio_read(PORT_REG * port, int pin) {
+	if(port->IN & pin == 0) {
+		return 0;
+	} 
+	return 1;
+}
+
 void led_initialize() {
 	gpio_set_dir(PORTB_REG, PIN30, DIROUT);
 }

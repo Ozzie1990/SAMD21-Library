@@ -166,12 +166,14 @@ typedef struct {
 #define TC7_REG ((TC_16bit_t *)0x42003C00)
 
 //Modes for TC
-#define NFRQ	0x0
-#define MFRQ	0x1
-#define NPWM	0x2
-#define MPWM	0x3
+#define NFRQ	0x0		//Normal Frequency:		Go to max value (8, 16 or 32bit)
+#define MFRQ	0x1		//Match Frequency:		Match what's in CC0
+#define NPWM	0x2		//Normal PWM:			Go to max value (8, 16 or 32bit)
+#define MPWM	0x3		//Match PWM:			Match what's in CC0
 
 void tc_init(int tc, int clk_src, int mode, uint16_t cc0);
+void tc_en(TC_16bit_t * tc, int enable);
 void tc_set_timer(int seconds);
+void tc_reset_cnt16(TC_16bit_t * tc);
 
 #endif /* TC_H_ */

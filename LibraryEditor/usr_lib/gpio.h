@@ -123,6 +123,7 @@ void gpio_set_mux(PORT_REG * port, int pin, int perph, int input_enable, int pul
 void gpio_set_mux_fast(PORT_REG * port, pin_t pin, int perph, int input_enable, int pullup, int drive_strength);
 void gpio_mux_disable(PORT_REG * port, int pin);
 void gpio_set_out(PORT_REG * port, int pin, int data);
+int  gpio_read(PORT_REG * port, int pin);
 
 void led_initialize();
 void led_toggle();

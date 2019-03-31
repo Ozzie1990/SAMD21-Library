@@ -77,8 +77,9 @@ static char REFLOW_OVEN_COMMANDS[][3] = {"STS","STR","STP","TMP"};
 
 char reflow_oven_user_input[100];
 static int reflow_oven_user_input_cnt = 0;
+int uart_enable = 0;
 
-void reflow_oven_init(int uart_enable);
+void reflow_oven_init();
 void reflow_oven_send_command(uint8_t cmd);
 uint16_t reflow_oven_read_temp();
 void reflow_oven_start_profile();
@@ -88,5 +89,8 @@ void reflow_oven_set(int on);
 void reflow_oven_check_user_input();
 void reflow_oven_timer();
 void reflow_oven_set_timer();
+void reflow_oven_reset_timer();
+inline void reflow_oven_start_timer();
+void reflow_oven_turn_off();
 
 #endif /* REFLOW_OVEN_H_ */

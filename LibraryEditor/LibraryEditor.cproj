@@ -150,9 +150,103 @@
     <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="usr_lib\adc.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usr_lib\adc.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usr_lib\clock.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usr_lib\clock.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usr_lib\commands.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usr_lib\debug.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usr_lib\debug.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usr_lib\drone_controller.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usr_lib\drone_controller.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usr_lib\gpio.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usr_lib\gpio.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usr_lib\i2c.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usr_lib\i2c.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usr_lib\interrupt.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usr_lib\pm.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usr_lib\pm.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usr_lib\pwm.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usr_lib\pwm.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usr_lib\rc_controller.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usr_lib\rc_controller.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usr_lib\reflow_oven.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usr_lib\reflow_oven.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usr_lib\samd21.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usr_lib\samd21.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usr_lib\sercom.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usr_lib\spi.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usr_lib\spi.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usr_lib\tc.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usr_lib\tc.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usr_lib\uart.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="usr_lib\uart.h">
+      <SubType>compile</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Device_Startup\" />
+    <Folder Include="usr_lib\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Device_Startup\samd21g18au_flash.ld">

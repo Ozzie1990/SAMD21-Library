@@ -6,6 +6,7 @@
  */ 
 
 #include "tc.h"
+#include "interrupt.h"
 
 void tc_init(int tc, int clk_src, int mode, uint16_t cc0) {
 	TC_16bit_t * reg;

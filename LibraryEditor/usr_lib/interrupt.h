@@ -12,6 +12,7 @@
 #include "stdint-gcc.h"
 #include "samd21.h"
 
+//Need to set to 1 to enable interrupt
 typedef union {
 	struct {
 		uint32_t PM:		1;
@@ -50,6 +51,7 @@ typedef union {
 	uint32_t reg;
 } INTERRUPT;
 
+//User ISER_SAMD21 to set interrupt bit
 typedef struct {
 	_REG INTERRUPT ISER_SAMD21;
 	_REG INTERRUPT ICER_SAMD21;

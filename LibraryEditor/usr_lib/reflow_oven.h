@@ -52,7 +52,7 @@ static char REFLOW_OVEN_COMMANDS[][3] = {"STS","STR","STP","TMP"};
 #define REFLOW_OVEN_ZONE_4		0x0177  //30C	
 
 //Time constants for zone 2 and 3
-#define REFLOW_OVEN_ZONE_2_TIME 90	//seconds
+#define REFLOW_OVEN_ZONE_2_TIME 90 //90	//seconds
 #define REFLOW_OVEN_ZONE_3_TIME 30	//seconds
 
 #define REFLOW_OVEN_MESSAGE_WELCOME			"Welcome to Easy Reflow\nVersion 1.00\r\n\r\n"
@@ -77,7 +77,7 @@ static char REFLOW_OVEN_COMMANDS[][3] = {"STS","STR","STP","TMP"};
 
 char reflow_oven_user_input[100];
 static int reflow_oven_user_input_cnt = 0;
-int uart_enable = 0;
+static int rfl_uart_enable = 0;
 
 void reflow_oven_init();
 void reflow_oven_send_command(uint8_t cmd);

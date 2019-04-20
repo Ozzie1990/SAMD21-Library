@@ -28,10 +28,10 @@ void reflow_oven_init() {
 	gpio_set_dir(PORTA_REG, PIN5, DIRIN);	//On = 1	Off = 0
 	//TODO: Set up interrupt for the on/off switch.
 	
-	uart_enable = gpio_read(PORTA_REG, PIN4);	//Read switch
+	rfl_uart_enable = 0; //gpio_read(PORTA_REG, PIN4);	//Read switch
 	int start = 0;	//Start bit, read later
 
-	if(uart_enable) {
+	if(rfl_uart_enable) {
 		uart_quick_en();//Enable UART for communication
 		
 		uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_WELCOME);
@@ -42,7 +42,7 @@ void reflow_oven_init() {
 	gpio_set_dir(PORTB_REG, PIN7, DIROUT);	//Set relay GPIO port
 	
 	//Message
-	if(uart_enable) {
+	if(rfl_uart_enable) {
 		uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_INIT_ADC);
 	}
 	
@@ -53,18 +53,18 @@ void reflow_oven_init() {
 	rfl_ovn_status.State = IDLE;
 	rfl_ovn_status.Temp = 0x00;
 	
-	if(uart_enable) {
+	if(rfl_uart_enable) {
 		uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_INIT_COMPLETE);
 	}
 	
-	gpio_set_dir(PORTB_REG, PIN11 | PIN12, | PIN13 | PIN14 | PIN15, DIROUT);	//Zone LEDs
-	gpio_set_out(PORTB_REG, PIN11 | PIN12, | PIN13 | PIN14 | PIN15, LOW);		//Zone LEDs set low
+	gpio_set_dir(PORTB_REG, PIN11 | PIN12 | PIN13 | PIN14 | PIN15, DIROUT);	//Zone LEDs
+	gpio_set_out(PORTB_REG, PIN11 | PIN12 | PIN13 | PIN14 | PIN15, LOW);		//Zone LEDs set low
 	
 	start = gpio_read(PORTA_REG, PIN5);	//Read start switch
 	
 	//Attempt to start after initialization
 	if(start) {
-		reflow_oven_start_profile(uart_enable);
+		reflow_oven_start_profile(rfl_uart_enable);
 	}
 	
 	//If this is reached then manually start after in the main.c file by toggling the on/off switch
@@ -115,22 +115,22 @@ uint16_t reflow_oven_read_temp() {
 	while(!adc_ready()) {	/*Wait for data to be ready */}
 	
 	adc_ready_clr();	//Clear Ready
-	
-	return adc_read();				//Return data
+	int temp = adc_read();
+	return temp;			//Return data
 }
 
-void reflow_oven_start_profile(int uart_enable) {
+void reflow_oven_start_profile(int rfl_uart_enable) {
 	
 	/*****************ZONE 1**********************/
 	reflow_oven_set(ON);
 	gpio_set_out(PORTB_REG, PIN11, HIGH);	//LED
 	
-	if(uart_enable) {
+	if(rfl_uart_enable) {
 		uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_START_PROFILE);
 		uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_PROFILE_ZONE1);
 	}
 	
-	while(adc_read() <= REFLOW_OVEN_ZONE_2) { /**WAIT**/ }		
+	while(reflow_oven_read_temp() <= REFLOW_OVEN_ZONE_2) { /**WAIT**/ }		
 	/*****************ZONE 1 END*******************/
 		
 		
@@ -139,7 +139,7 @@ void reflow_oven_start_profile(int uart_enable) {
 	reflow_oven_start_timer();	//Set timer for 90s
 	gpio_set_out(PORTB_REG, PIN12, HIGH);	//LED
 	
-	if(uart_enable) {
+	if(rfl_uart_enable) {
 		uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_PROFILE_ZONE2);
 	}
 
@@ -152,11 +152,11 @@ void reflow_oven_start_profile(int uart_enable) {
 	reflow_oven_set(ON);	//Increase reflow oven temp
 	gpio_set_out(PORTB_REG, PIN13, HIGH);	//LED
 	
-	if(uart_enable) {
+	if(rfl_uart_enable) {
 		uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_PROFILE_ZONE3);
 	}
 	
-	while(adc_read() <= REFLOW_OVEN_ZONE_3) { /**WAIT**/ }
+	while(reflow_oven_read_temp() <= REFLOW_OVEN_ZONE_3) { /**WAIT**/ }
 	
 	reflow_oven_start_timer();	//Set timer for 30s
 	reflow_oven_set(OFF);	//Turn off to keep at temperature
@@ -171,13 +171,13 @@ void reflow_oven_start_profile(int uart_enable) {
 	reflow_oven_set(OFF);
 	gpio_set_out(PORTB_REG, PIN14, HIGH);	//LED
 	
-	if(uart_enable) {
+	if(rfl_uart_enable) {
 		uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_PROFILE_ZONE4);
 	}
 	
-	while(adc_read() >= REFLOW_OVEN_ZONE_4) { /**WAIT**/ }
+	while(reflow_oven_read_temp() >= REFLOW_OVEN_ZONE_4) { /**WAIT**/ }
 	
-	if(uart_enable) {
+	if(rfl_uart_enable) {
 		uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_PROFILE_DONE);
 	}
 	
@@ -261,11 +261,14 @@ void reflow_oven_timer() {
 	} else {
 		rfl_ovn_time_tmp += 1;
 	}
+	
+	TC3_REG->INTFLAG.bits.MC0 = 1;	//Must reset interrupt
 }
 
 void reflow_oven_set_timer() {
 
-	tc_init(TC3, GCLK0, MFRQ, 0xC350) //50,000 timer (1 second = 20 counts if FCLK = 1MHz)
+	tc_init(3, GCLK0, MFRQ, 0xC350); //50,000 timer (1 second = 20 counts if FCLK = 1MHz)
+	INTERRUPT_SAMD21->ISER_SAMD21.bits.TC3 = 1;	//Enable Interrupt
 }
 
 /*
@@ -304,9 +307,8 @@ void reflow_oven_turn_off() {
 
 /* CODE TO COPY INTO MAIN.C
 
-#include "usr_lib/samd21.h"
 #include "usr_lib/reflow_oven.h"
-#include "interrupt.h"				//Needed for the TC3_Hanlder function
+#include "samd21.h"				//Needed for the TC3_Hanlder function
 
 void TC3_Hanlder() { reflow_oven_timer() }	//Increments counter when enabled
 	
@@ -322,7 +324,7 @@ int main(void) {
 		if(!gpio_read(PORTA_REG, PIN5)) {
 			while(1) {
 				if(gpio_read(PORTA_REG, PIN5) {
-					reflow_oven_start_profile(uart_enable);
+					reflow_oven_start_profile(rfl_uart_enable);
 					break;	//End of cycle, wait for switch toggle again
 				}
 			}

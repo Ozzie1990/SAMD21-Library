@@ -3,7 +3,7 @@
  *
  * \brief gcc starttup file for SAMD21
  *
- * Copyright (c) 2016 Atmel Corporation,
+ * Copyright (c) 2017 Atmel Corporation,
  *                    a wholly owned subsidiary of Microchip Technology Inc.
  *
  * \asf_license_start
@@ -101,7 +101,12 @@ void DAC_Handler             ( void ) __attribute__ ((weak, alias("Dummy_Handler
 #ifdef ID_PTC
 void PTC_Handler             ( void ) __attribute__ ((weak, alias("Dummy_Handler")));
 #endif
+#ifdef ID_I2S
 void I2S_Handler             ( void ) __attribute__ ((weak, alias("Dummy_Handler")));
+#endif
+#ifdef ID_AC1
+void AC1_Handler             ( void ) __attribute__ ((weak, alias("Dummy_Handler")));
+#endif
 
 /* Exception Table */
 __attribute__ ((section(".vectors")))
@@ -176,7 +181,7 @@ const DeviceVectors exception_table = {
         .pvReserved23           = (void*) (0UL),                  /* 23 Reserved */
 #endif
 #ifdef ID_AC
-        .pfnAC_Handler          = (void*) AC_Handler,             /* 24 Analog Comparators */
+        .pfnAC_Handler          = (void*) AC_Handler,             /* 24 Analog Comparators 0 */
 #else
         .pvReserved24           = (void*) (0UL),                  /* 24 Reserved */
 #endif
@@ -190,8 +195,16 @@ const DeviceVectors exception_table = {
 #else
         .pvReserved26           = (void*) (0UL),                  /* 26 Reserved */
 #endif
+#ifdef ID_I2S
         .pfnI2S_Handler         = (void*) I2S_Handler,            /* 27 Inter-IC Sound Interface */
+#else
+        .pvReserved27           = (void*) (0UL),                  /* 27 Reserved */
+#endif
+#ifdef ID_AC1
+        .pfnAC1_Handler         = (void*) AC1_Handler             /* 28 Analog Comparators 1 */
+#else
         .pvReserved28           = (void*) (0UL)                   /* 28 Reserved */
+#endif
 };
 
 /**

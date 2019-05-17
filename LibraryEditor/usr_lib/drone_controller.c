@@ -111,7 +111,7 @@ void setMotor4Speed(uint16_t speed) {
 }
 
 /**************************************************
-*	Function Name :  Auto Stabalizer
+*	Function Name :  Auto Stabilizer
 *
 *   Description :	For Testing
 *
@@ -121,11 +121,9 @@ void drone_auto_stabilizer() {
 	while(1) {
 		drone_x_system(65500);
 		drone_y_system(0);	//Might be backwards with X axis
-		//updateMotors();	//Update motor speed
+		//updateMotors();	//Update motor speed TODO: Add in after updating motor speed code below
 		//resetMotorSpeed();	//Reset motor speed variable (does not stop motors)
 	}
-	
-
 }
 
 /**************************************************
@@ -168,6 +166,12 @@ int PID_Handler(int diffGain, int intGain, int propGain, int PID_In) {
 *
 *   Description :	Provide user input to system and subtract it from the previous plant output to then 
 *					be used by the setPlant function for use in the PID/Plant model
+*
+*   Visual:   _______							  _____	  _______		  ________
+*			  |INPUT| ---- (+)---[systempInput]---|PID|---|PLANT|--o-----|POSITION|
+*							|(-)								   |
+*						    |									   |
+*							|---[drone_plant_x_output]-------------|
 *
 ***************************************************/
 void drone_x_system(int input) {
@@ -246,7 +250,8 @@ int plant(int axis, int input) {
 			motor3Speed += speed/8;
 			motor4Speed += speed/2;
 			axisData = getYAxis();
-		}*/
+		}
+		*/
 		
 	} else {
 		
@@ -290,7 +295,8 @@ int plant(int axis, int input) {
 			motor3Speed += speed/2;
 			motor4Speed += speed/8;
 			axisData = getYAxis();
-		}*/
+		}
+		*/
 	}
 	
 	return axisData;	
@@ -411,7 +417,7 @@ int getAllAxis(int * x, int * y, int * z) {
 *				5. Send NACK and Stop Bit
 *
 ***************************************************/
-int read_ADC(int data) {
+int read_ADC(int data) {	//TODO: ADC?  Fix later
 
 	/***************Step 1**********************/
 	I2C0_REG->CNTRLB.bits.QCEN = 0;	//Clear quick commands

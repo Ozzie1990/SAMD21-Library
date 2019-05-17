@@ -50,6 +50,8 @@ void tc_init(int tc, int clk_src, int mode, uint16_t cc0) {
 	reg->CTRLA.bits.WAVEGEN = mode;
 	reg->CC0 = cc0;
 	reg->INTENSET.bits.MC0 = 1;	//DEFAULTED TO ENABLE INTERRUPT
+	
+	//INTERRUPT_SAMD21->ISER_SAMD21.bits.TC3 = 1;  //Global enable set up
 }
 
 void tc_en(TC_16bit_t * tc, int enable) {

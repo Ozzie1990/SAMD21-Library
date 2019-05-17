@@ -99,7 +99,7 @@ typedef struct{
 	_REG	uint32_t		DIRCLR;
 	_REG	uint32_t		DIRSET;
 	_REG	uint32_t		DIRTGL;
-	_REG	uint32_t		OUT;
+	_REG	PORT_OUT		OUT;
 	_REG	uint32_t		OUTCLR;
 	_REG	uint32_t		OUTSET;
 	_REG	uint32_t		OUTTGL;

@@ -28,8 +28,8 @@ void reflow_oven_init() {
 	gpio_set_dir(PORTA_REG, PIN5, DIRIN);	//On = 1	Off = 0
 	//TODO: Set up interrupt for the on/off switch.
 	
-	rfl_uart_enable = 0; //gpio_read(PORTA_REG, PIN4);	//Read switch
-	int start = 0;	//Start bit, read later
+	rfl_uart_enable = 0; //gpio_read(PORTA_REG, PIN4);	//Read switch (CURRENTLY OVERRIDEN FOR TESTING)
+	int start = 0;	//Start bit, read later TODO: IMPLEMENT FULLY
 
 	if(rfl_uart_enable) {
 		uart_quick_en();//Enable UART for communication
@@ -52,6 +52,7 @@ void reflow_oven_init() {
   
 	rfl_ovn_status.State = IDLE;
 	rfl_ovn_status.Temp = 0x00;
+	rfl_ovn_status.RelayState = 0;
 	
 	if(rfl_uart_enable) {
 		uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_INIT_COMPLETE);
@@ -114,49 +115,101 @@ uint16_t reflow_oven_read_temp() {
 	
 	while(!adc_ready()) {	/*Wait for data to be ready */}
 	
-	adc_ready_clr();	//Clear Ready
-	int temp = adc_read();
+	adc_ready_clr();		//Clear Ready
+	int temp = adc_read();	//Used during debugging for easy read
 	return temp;			//Return data
 }
 
+/*
+ * Function:  rerflow_oven_toggle_heater
+ * -------------------------------------
+ *  Used to toggle heating element.  Usually having it on for too long will damage it.  So a quick toggle
+ *  10 seconds on and 10 seconds off, helps build heat while giving the element time to cool.
+ *
+ *  void
+ *
+ *  returns: null
+ */
+void reflow_oven_toggle_heater() {
+	if((rfl_ovn_time >= 10) && rfl_ovn_status.RelayState) {
+		reflow_oven_set(OFF);
+		reflow_oven_reset_timer();
+		reflow_oven_start_timer();
+	} else if((rfl_ovn_time >= 10) && !rfl_ovn_status.RelayState) {
+		reflow_oven_set(ON);
+		reflow_oven_reset_timer();
+		reflow_oven_start_timer();
+	}
+}
+
+void reflow_oven_set_pwm(uint16_t pwm) {
+	
+}
+
+/*
+ * Function:  rerflow_oven_start_profile
+ * -------------------------------------
+ *  The heart of the reflow oven.  After calling _init you can call this immediately
+ *  Controls the relay and ZONE LEDS.  Also checks the temperature and time for each different ZONE.
+ *
+ *  rfl_uart_enable: Enable UART communication
+ *
+ *  returns: null
+ */
 void reflow_oven_start_profile(int rfl_uart_enable) {
 	
 	/*****************ZONE 1**********************/
 	reflow_oven_set(ON);
-	gpio_set_out(PORTB_REG, PIN11, HIGH);	//LED
+	//Change to PWM
+	rfl_ovn_status.RelayState = 1;
+	PORTB_REG->OUT.bit.bit11 = HIGH; //LED
 	
 	if(rfl_uart_enable) {
 		uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_START_PROFILE);
 		uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_PROFILE_ZONE1);
 	}
 	
-	while(reflow_oven_read_temp() <= REFLOW_OVEN_ZONE_2) { /**WAIT**/ }		
+	reflow_oven_reset_timer();
+	reflow_oven_start_timer();
+	while(reflow_oven_read_temp() <= REFLOW_OVEN_ZONE_2) { 
+		reflow_oven_toggle_heater();
+	}		
+	
+	reflow_oven_reset_timer();
 	/*****************ZONE 1 END*******************/
 		
 		
 	/*****************ZONE 2**********************/
 	reflow_oven_set(OFF);		//Turn off to keep at temperature
+	rfl_ovn_status.RelayState = 0;
+	PORTB_REG->OUT.bit.bit12 = HIGH; //LED
+	
 	reflow_oven_start_timer();	//Set timer for 90s
-	gpio_set_out(PORTB_REG, PIN12, HIGH);	//LED
 	
 	if(rfl_uart_enable) {
 		uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_PROFILE_ZONE2);
 	}
 
 	while(rfl_ovn_time < REFLOW_OVEN_ZONE_2_TIME) { /**WAIT**/ }
-	reflow_oven_reset_timer();
 	/*****************ZONE 2 END*******************/
 	
 	
 	/*****************ZONE 3**********************/
 	reflow_oven_set(ON);	//Increase reflow oven temp
-	gpio_set_out(PORTB_REG, PIN13, HIGH);	//LED
+	rfl_ovn_status.RelayState = 1;
+	
+	PORTB_REG->OUT.bit.bit13 = HIGH; //LED
 	
 	if(rfl_uart_enable) {
 		uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_PROFILE_ZONE3);
 	}
 	
-	while(reflow_oven_read_temp() <= REFLOW_OVEN_ZONE_3) { /**WAIT**/ }
+	reflow_oven_reset_timer();
+	reflow_oven_start_timer();
+	while(reflow_oven_read_temp() <= REFLOW_OVEN_ZONE_3) { 
+		reflow_oven_toggle_heater();
+	}
+	reflow_oven_reset_timer();
 	
 	reflow_oven_start_timer();	//Set timer for 30s
 	reflow_oven_set(OFF);	//Turn off to keep at temperature
@@ -169,7 +222,9 @@ void reflow_oven_start_profile(int rfl_uart_enable) {
 	/*****************ZONE 4**********************/
 	//Start zone 4, turn off the oven and open it to cool off
 	reflow_oven_set(OFF);
-	gpio_set_out(PORTB_REG, PIN14, HIGH);	//LED
+	rfl_ovn_status.RelayState = 0;
+	
+	PORTB_REG->OUT.bit.bit14 = HIGH; //LED
 	
 	if(rfl_uart_enable) {
 		uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_PROFILE_ZONE4);
@@ -184,14 +239,18 @@ void reflow_oven_start_profile(int rfl_uart_enable) {
 	/*****************ZONE 4 END*******************/
 	
 	gpio_set_out(PORTB_REG, PIN15, HIGH);
+	
+	//TODO: Add buzzer code here
 }
 
 void reflow_oven_set(int on) {
 	if (on) {
-		gpio_set_out(PORTB_REG, PIN7, HIGH);
+		PORTB_REG->OUT.bit.bit7 = HIGH;
+		//gpio_set_out(PORTB_REG, PIN7, HIGH);
 		rfl_ovn_status.RelayState = 1;
 	} else {
-		gpio_set_out(PORTB_REG, PIN7, LOW);
+		PORTB_REG->OUT.bit.bit7 = LOW;
+		//gpio_set_out(PORTB_REG, PIN7, LOW);
 		rfl_ovn_status.RelayState = 0;
 	}
 }

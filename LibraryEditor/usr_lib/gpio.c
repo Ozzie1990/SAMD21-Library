@@ -15,11 +15,13 @@ void gpio_set_dir(PORT_REG * port, int pin, int dir) {
 	}
 }
 
+//Need to fix this code, idea is ok but Assembly conversion makes it turn off/on all LEDs?  Might be an
+//anomaly due to a bad/damaged chip.
 void gpio_set_out(PORT_REG * port, int pin, int data) {
 	if(data == 0) {
-		port->OUT &= !pin;
+		port->OUT.reg &= !pin;
 	} else {
-		port->OUT |= pin;
+		port->OUT.reg |= pin;
 	}
 }
 

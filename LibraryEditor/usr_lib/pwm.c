@@ -72,3 +72,22 @@ void pwm_init(PORT_REG * port, int pin, int perph, int tc, int clk_source, int p
 void pwm_set_duty_cycle(TC_16bit_t * tc, uint16_t pwm_value) {
 	tc->CC0 = pwm_value;
 }
+
+void pwm_default(t_PWM_PARAMETERS param) {
+	pwm_init(param.tc_port, param.pin, param.perph, param.tc, param.clk_source, param.pwm_mode, param.run_stdby, param.duty_cycle);
+}
+
+t_PWM_PARAMETERS pwm_get_param() {
+	t_PWM_PARAMETERS parameters;
+	
+	parameters.clk_source = 0;
+	parameters.duty_cycle = (0xFFFF/8);
+	parameters.perph = PERPHE;
+	parameters.pin = PIN8;
+	parameters.pwm_mode = NPWM;
+	parameters.run_stdby = PWM_RN_STDBY_TRUE;
+	parameters.tc = 3;
+	parameters.tc_port = TC3_REG;
+	
+	return parameters;
+}

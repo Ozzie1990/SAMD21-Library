@@ -147,7 +147,7 @@ void reflow_oven_set_pwm(uint16_t pwm) {
 }
 
 /*
- * Function:  rerflow_oven_start_profile
+ * Function:  relow_oven_start_profile
  * -------------------------------------
  *  The heart of the reflow oven.  After calling _init you can call this immediately
  *  Controls the relay and ZONE LEDS.  Also checks the temperature and time for each different ZONE.

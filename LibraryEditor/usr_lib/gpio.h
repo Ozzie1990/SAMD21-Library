@@ -111,6 +111,12 @@ typedef struct{
 	_REG	PORT_CFG		PINCFG[31];
 } PORT_REG;
 
+typedef struct {
+	_REG PORT_REG *	port;
+	_REG uint32_t	pin;
+	_REG uint8_t	perh;
+} t_pin_info;
+
 #define PORTB_REG ((PORT_REG *) 0x41004480)
 #define PORTA_REG ((PORT_REG *) 0x41004400)
 

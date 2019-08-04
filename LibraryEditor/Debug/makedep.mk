@@ -20,6 +20,8 @@ usr_lib\gpio.c
 
 usr_lib\i2c.c
 
+usr_lib\interrupt.c
+
 usr_lib\pm.c
 
 usr_lib\pwm.c

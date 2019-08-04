@@ -48,6 +48,7 @@ C_SRCS +=  \
 ../usr_lib/drone_controller.c \
 ../usr_lib/gpio.c \
 ../usr_lib/i2c.c \
+../usr_lib/interrupt.c \
 ../usr_lib/pm.c \
 ../usr_lib/pwm.c \
 ../usr_lib/rc_controller.c \
@@ -74,6 +75,7 @@ usr_lib/debug.o \
 usr_lib/drone_controller.o \
 usr_lib/gpio.o \
 usr_lib/i2c.o \
+usr_lib/interrupt.o \
 usr_lib/pm.o \
 usr_lib/pwm.o \
 usr_lib/rc_controller.o \
@@ -93,6 +95,7 @@ usr_lib/debug.o \
 usr_lib/drone_controller.o \
 usr_lib/gpio.o \
 usr_lib/i2c.o \
+usr_lib/interrupt.o \
 usr_lib/pm.o \
 usr_lib/pwm.o \
 usr_lib/rc_controller.o \
@@ -112,6 +115,7 @@ usr_lib/debug.d \
 usr_lib/drone_controller.d \
 usr_lib/gpio.d \
 usr_lib/i2c.d \
+usr_lib/interrupt.d \
 usr_lib/pm.d \
 usr_lib/pwm.d \
 usr_lib/rc_controller.d \
@@ -131,6 +135,7 @@ usr_lib/debug.d \
 usr_lib/drone_controller.d \
 usr_lib/gpio.d \
 usr_lib/i2c.d \
+usr_lib/interrupt.d \
 usr_lib/pm.d \
 usr_lib/pwm.d \
 usr_lib/rc_controller.d \
@@ -156,6 +161,8 @@ LINKER_SCRIPT_DEP+=  \
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

@@ -114,6 +114,29 @@ typedef struct {
 }UART_REG;
 
 typedef struct {
+	_REG UART_CTRLA				CNTRLA;
+	_REG UART_CTRLB				CNTRLB;
+	_REG uint32_t				reserved0;
+	_REG uint16_t				BAUD;
+	_REG uint8_t				RXPL;
+	_REG uint32_t				reserved1;
+	_REG UART_INTENCLR			INTENCLR;
+	_REG uint8_t				reserved3;
+	_REG UART_INTENSET			INTENSET;
+	_REG uint8_t				reserved4;
+	_REG UART_INTFLAG			INTFLAG;
+	_REG uint8_t				reserved5;
+	_REG uint16_t				STATUS;
+	_REG uint32_t				SYNCBUSY;
+	_REG uint32_t				reserved6;
+	_REG uint32_t				reserved7;
+	_REG UART_DATA				DATA;
+	_REG uint32_t				reserved8;
+	_REG uint16_t				reserved9;
+	_REG uint8_t				DBGCTRL;
+}t_uart_reg;
+
+typedef struct {
 	uint8_t COM_PORT_NUM;
 	UART_REG* RX_PORT;
 	UART_REG* TX_PORT;
@@ -154,5 +177,12 @@ uint8_t uart_read_data(UART_REG * reg);
 int uart_rx_interrupt_handler(UART_REG * reg, uint8_t echo);
 
 void uart_quick_en();
+
+//New Code to Replace Old
+t_uart_reg * uart_get_reg(int comm_port, t_pin_info rx, t_pin_info tx);
+void uart_en(t_uart_reg * uart);
+void uart_dis(t_uart_reg * uart);
+t_pin_info uart_rx_pin();
+t_pin_info uart_tx_pin();
 
 #endif /* UART_H_ */

@@ -205,6 +205,9 @@
     <Compile Include="usr_lib\i2c.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="usr_lib\interrupt.c">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="usr_lib\interrupt.h">
       <SubType>compile</SubType>
     </Compile>

@@ -61,6 +61,9 @@ typedef struct {
 
 #define INTERRUPT_SAMD21 ((INT_SAMD21 *) 0xE000E100)
 
+
+//pointerToISR 0xE000E100 = IRQ_SERCOM0;
+
 /*typedef struct {
 	_REG uint32_t PM;
 	_REG uint32_t SYSCTRL;
@@ -91,6 +94,8 @@ typedef struct {
 	_REG uint32_t PTC;
 	_REG uint32_t I2S;
 }INT_TABLE;*/
+
+
 
 #define INT_VEC ((INT_TABLE *) 0x20000050)
 

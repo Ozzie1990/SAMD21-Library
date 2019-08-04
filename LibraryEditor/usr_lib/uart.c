@@ -228,3 +228,104 @@ void uart_quick_en() {
 	uart_initialize(uart);
 	uart_enable(0);
 }
+
+/*
+*	Function: uart_get_reg
+*	
+*	Description:  returns a pre-configured uart register for use by the user 
+*   
+*/
+
+t_uart_reg * uart_get_reg(int comm_port, t_pin_info rx, t_pin_info tx) {
+	
+	t_uart_reg * uart;
+	
+	//Set Input Clock
+	GCLK_REG->CLKCNTRL.bits.GEN = 0;
+	
+	//Set UART SERCOM address and initialize power management
+	switch(comm_port) {
+		case 0:
+			uart = UART0_REG;
+			PM_REG->AHBCMASK.bits.PMSERCOM0 = 1;
+			break;
+		
+		case 1:
+			uart = UART1_REG;
+			PM_REG->AHBCMASK.bits.PMSERCOM1 = 1;
+			break;
+			
+		case 2:
+			uart = UART2_REG;
+			PM_REG->AHBCMASK.bits.PMSERCOM2 = 1;
+			break;
+			
+		case 3:
+			uart = UART3_REG;
+			PM_REG->AHBCMASK.bits.PMSERCOM3 = 1;
+			break;
+			
+		case 4:
+			uart = UART4_REG;
+			PM_REG->AHBCMASK.bits.PMSERCOM4 = 1;			
+			break;
+			
+		case 5:
+			uart = UART5_REG;
+			PM_REG->AHBCMASK.bits.PMSERCOM5 = 1;
+			break;
+			
+		default:
+			return;	//ERROR
+	}
+	
+	//Set GPIO MUX for UART use
+	gpio_set_mux(tx.port, tx.pin, tx.perh, MUX_INPUT_ENABLE, MUX_PULLUP_ENABLE, MUX_DRV_NORMAL);
+	gpio_set_mux(rx.port, rx.pin, rx.perh, MUX_INPUT_ENABLE, MUX_PULLUP_ENABLE, MUX_DRV_NORMAL);
+	
+	//Enable clock 
+	GCLK_REG->CLKCNTRL.bits.CLKEN = 1;
+	
+	//Get Baud Rate
+	uint16_t baud = get_baud_rate_async(9600, FCPU, 16);
+	
+	//Set UART
+	uart->CNTRLA.bits.MODE = 1;	//Set Mode
+	uart->CNTRLA.bits.DORD = 1;	//Set Data Order
+	uart->CNTRLA.bits.RXPO = 0;	//RX Pad Set
+	uart->CNTRLA.bits.TXPO = 1;	//TX Pad Set
+	uart->CNTRLA.bits.RUNSTDBY = 1;
+	uart->BAUD = baud;
+	uart->CNTRLB.bits.RXEN = 1;
+	uart->CNTRLB.bits.TXEN = 1;
+	
+	return uart;
+}
+
+void uart_en(t_uart_reg * uart) {
+	uart->CNTRLA.bits.EN = 1;
+}
+
+void uart_dis(t_uart_reg * uart) {
+	uart->CNTRLA.bits.EN = 0;
+}
+
+t_pin_info uart_rx_pin() {
+	t_pin_info rx;
+	
+	rx.port = PORTA_REG;
+	rx.pin = PIN23;
+	rx.perh = PERPHC;
+	
+	return rx;	
+}
+
+t_pin_info uart_tx_pin() {
+	t_pin_info tx;
+	
+	tx.port = PORTA_REG;
+	tx.pin = PIN22;
+	tx.perh - PERPHC;
+	
+	return tx;
+}

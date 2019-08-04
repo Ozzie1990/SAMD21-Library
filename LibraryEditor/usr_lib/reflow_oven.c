@@ -12,7 +12,7 @@
 /*
  * Function:  reflow_oven_init
  * --------------------
- * initalizes the reflow oven by 
+ * initializes the reflow oven by 
  * 1) Setting UART (if inputed)
  * 2) Setting the GPIO
  * 3) Setting the Timer
@@ -121,7 +121,7 @@ uint16_t reflow_oven_read_temp() {
 }
 
 /*
- * Function:  rerflow_oven_toggle_heater
+ * Function:  reflow_oven_toggle_heater
  * -------------------------------------
  *  Used to toggle heating element.  Usually having it on for too long will damage it.  So a quick toggle
  *  10 seconds on and 10 seconds off, helps build heat while giving the element time to cool.

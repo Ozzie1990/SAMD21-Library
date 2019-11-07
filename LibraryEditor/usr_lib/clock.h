@@ -9,7 +9,6 @@
 #ifndef CLOCK_H_
 #define CLOCK_H_
 
-#include "stdint-gcc.h"
 #include "samd21.h"
 
 #define GCLK0	0

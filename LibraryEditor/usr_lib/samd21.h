@@ -9,7 +9,8 @@
 #ifndef SAMD21_H_
 #define SAMD21_H_
 
-#include "stdint-gcc.h"
+//#include "stdint-gcc.h" //For Atmel Studio ADD BACK IN
+#include "stdio.h"  //For XCODE REMOVE
 
 #define _REG volatile
 #define FCPU 1000000

@@ -9,7 +9,6 @@
 #ifndef GPIO_H_
 #define GPIO_H_
 
-#include "stdint-gcc.h"
 #include "samd21.h"
 
 #define DIROUT		1
@@ -111,10 +110,14 @@ typedef struct{
 	_REG	PORT_CFG		PINCFG[31];
 } PORT_REG;
 
+//Pin data
 typedef struct {
 	_REG PORT_REG *	port;
 	_REG uint32_t	pin;
-	_REG uint8_t	perh;
+	_REG uint8_t	perph;
+    _REG uint32_t   inputEnable;
+    _REG uint32_t   pullup;
+    _REG uint32_t   driveStrength;
 } t_pin_info;
 
 #define PORTB_REG ((PORT_REG *) 0x41004480)
@@ -138,5 +141,12 @@ void usart3_pad01_set();
 void spi0_set();
 //void led_on();
 //void led_off();
+
+/*      New Code        */
+
+void gpioSetMux(t_pin_info pin);
+t_pin_info * gpioGetPin(PORT_REG * port, int pin, uint8_t perph);
+t_pin_info * gpioDisablePullup(t_pin_info * pin);
+t_pin_info * gpioEnablePullup(t_pin_info * pin);
 
 #endif /* GPIO_H_ */

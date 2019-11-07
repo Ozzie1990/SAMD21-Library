@@ -9,6 +9,7 @@
 //NOTE: CURRENTLY UART COMMUNICATION WITH THIS SYSTEM IS NOT TESTED/COMPLETE, DO NOT RECOMMEND USING
 //NEEDS TO BE FIXED WITH INTERRUPTS NOT WITH THE CURRENT SET UP OTHERWISE THE SYSTEM COULD LATCH!!!!!
 
+//TEST OF LINKING IN XCODE//
 /*
  * Function:  reflow_oven_init
  * --------------------
@@ -159,88 +160,133 @@ void reflow_oven_set_pwm(uint16_t pwm) {
 void reflow_oven_start_profile(int rfl_uart_enable) {
 	
 	/*****************ZONE 1**********************/
-	reflow_oven_set(ON);
-	//Change to PWM
-	rfl_ovn_status.RelayState = 1;
-	PORTB_REG->OUT.bit.bit11 = HIGH; //LED
-	
-	if(rfl_uart_enable) {
-		uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_START_PROFILE);
-		uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_PROFILE_ZONE1);
-	}
-	
-	reflow_oven_reset_timer();
-	reflow_oven_start_timer();
-	while(reflow_oven_read_temp() <= REFLOW_OVEN_ZONE_2) { 
-		reflow_oven_toggle_heater();
-	}		
-	
-	reflow_oven_reset_timer();
+    
+    if(rfl_uart_enable) {
+        uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_START_PROFILE);
+        uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_PROFILE_ZONE1);
+    }
+    
+    reflowOvenZone1();
 	/*****************ZONE 1 END*******************/
 		
 		
 	/*****************ZONE 2**********************/
-	reflow_oven_set(OFF);		//Turn off to keep at temperature
-	rfl_ovn_status.RelayState = 0;
-	PORTB_REG->OUT.bit.bit12 = HIGH; //LED
-	
-	reflow_oven_start_timer();	//Set timer for 90s
-	
-	if(rfl_uart_enable) {
-		uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_PROFILE_ZONE2);
-	}
-
-	while(rfl_ovn_time < REFLOW_OVEN_ZONE_2_TIME) { /**WAIT**/ }
+    if(rfl_uart_enable) {
+        uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_PROFILE_ZONE2);
+    }
+    
+    reflowOvenZone2();
 	/*****************ZONE 2 END*******************/
 	
 	
 	/*****************ZONE 3**********************/
-	reflow_oven_set(ON);	//Increase reflow oven temp
-	rfl_ovn_status.RelayState = 1;
-	
-	PORTB_REG->OUT.bit.bit13 = HIGH; //LED
-	
-	if(rfl_uart_enable) {
-		uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_PROFILE_ZONE3);
-	}
-	
-	reflow_oven_reset_timer();
-	reflow_oven_start_timer();
-	while(reflow_oven_read_temp() <= REFLOW_OVEN_ZONE_3) { 
-		reflow_oven_toggle_heater();
-	}
-	reflow_oven_reset_timer();
-	
-	reflow_oven_start_timer();	//Set timer for 30s
-	reflow_oven_set(OFF);	//Turn off to keep at temperature
-	
-	while(rfl_ovn_time < REFLOW_OVEN_ZONE_3_TIME) { /**WAIT**/ }
-	reflow_oven_reset_timer();
+    if(rfl_uart_enable) {
+        uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_PROFILE_ZONE3);
+    }
+    
+    reflowOvenZone3();
 	/*****************ZONE 3 END*******************/
 	
 	
 	/*****************ZONE 4**********************/
 	//Start zone 4, turn off the oven and open it to cool off
-	reflow_oven_set(OFF);
-	rfl_ovn_status.RelayState = 0;
+    if(rfl_uart_enable) {
+        uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_PROFILE_ZONE4);
+    }
 	
-	PORTB_REG->OUT.bit.bit14 = HIGH; //LED
-	
-	if(rfl_uart_enable) {
-		uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_PROFILE_ZONE4);
-	}
-	
-	while(reflow_oven_read_temp() >= REFLOW_OVEN_ZONE_4) { /**WAIT**/ }
-	
-	if(rfl_uart_enable) {
-		uart_send_string(REFLOW_OVEN_UART, REFLOW_OVEN_MESSAGE_PROFILE_DONE);
-	}
+    reflowOvenZone4();
 	
 	/*****************ZONE 4 END*******************/
 	
 	gpio_set_out(PORTB_REG, PIN15, HIGH);
 	
 	//TODO: Add buzzer code here
+}
+
+/**
+ * Function:  reflowOvenZone1
+ *
+ *  Zone 1 of reflow oven.
+ *  Turns on oven until the defined temperature is reached
+ *
+ *  returns: null
+ **/
+void reflowOvenZone1(void) {
+    reflow_oven_set(ON);
+    //Change to PWM
+    rfl_ovn_status.RelayState = 1;
+    PORTB_REG->OUT.bit.bit11 = HIGH; //LED
+    
+    reflow_oven_reset_timer();
+    reflow_oven_start_timer();  //TODO: Find out if this can be removed
+    while(reflow_oven_read_temp() <= REFLOW_OVEN_ZONE_2) {
+        reflow_oven_toggle_heater();
+    }
+    
+    reflow_oven_reset_timer(); //TODO: Find out if this can be removed
+}
+
+/**
+ * Function:  reflowOvenZone2
+ *
+ *  Zone 2 of reflow oven.
+ *  Turns off oven for a set amount of time
+ *
+ *  returns: null
+ **/
+void reflowOvenZone2(void) {
+    reflow_oven_set(OFF);        //Turn off to keep at temperature
+    rfl_ovn_status.RelayState = 0;
+    PORTB_REG->OUT.bit.bit12 = HIGH; //LED
+    
+    reflow_oven_start_timer();    //Set timer for 90s
+    
+    while(rfl_ovn_time < REFLOW_OVEN_ZONE_2_TIME) { /**WAIT**/ }
+}
+
+/**
+ * Function:  reflowOvenZone3
+ *
+ *  Zone 3 of reflow oven.
+ *  Turns on oven until a certain temperature is reached then wait for 30s.
+ *
+ *  returns: null
+ **/
+void reflowOvenZone3(void) {
+    reflow_oven_set(ON);    //Increase reflow oven temp
+    rfl_ovn_status.RelayState = 1;
+    
+    PORTB_REG->OUT.bit.bit13 = HIGH; //LED
+    
+    reflow_oven_reset_timer();
+    reflow_oven_start_timer();  //TODO: Find out if this can be removed
+    while(reflow_oven_read_temp() <= REFLOW_OVEN_ZONE_3) {
+        reflow_oven_toggle_heater();
+    }
+    reflow_oven_reset_timer();  //TODO: Find out if this can be removed
+    
+    reflow_oven_start_timer();    //Set timer for 30s
+    reflow_oven_set(OFF);    //Turn off to keep at temperature
+    
+    while(rfl_ovn_time < REFLOW_OVEN_ZONE_3_TIME) { /**WAIT**/ }
+    reflow_oven_reset_timer();
+}
+
+/**
+ * Function:  reflowOvenZone4
+ *
+ *  Zone 4 of reflow oven.
+ *  Turns off the oven, 
+ *
+ *  returns: null
+ **/
+void reflowOvenZone4(void) {
+    reflow_oven_set(OFF);
+    rfl_ovn_status.RelayState = 0;
+    
+    PORTB_REG->OUT.bit.bit14 = HIGH; //LED
+    
+    while(reflow_oven_read_temp() >= REFLOW_OVEN_ZONE_4) { /**WAIT**/ }
 }
 
 void reflow_oven_set(int on) {
@@ -256,7 +302,7 @@ void reflow_oven_set(int on) {
 }
 
 
-void reflow_oven_check_user_input() {
+/*void reflow_oven_check_user_input() {
 	char response = uart_rx_interrupt_handler(REFLOW_OVEN_UART, 1);
 	
 	if(response == UART_USER_INPUT_COMPLETE) {
@@ -268,10 +314,10 @@ void reflow_oven_check_user_input() {
 		reflow_oven_user_input[reflow_oven_user_input_cnt] += response;
 		reflow_oven_user_input_cnt += 1;
 	}
-}
+}*/
 
 //Decodes user input and send it to the reflow oven controller
-void reflow_oven_cmd_decoder(char data[]) {
+/*void reflow_oven_cmd_decoder(char data[]) {
 	
 	uint8_t cmd_cnt = 0;
 	
@@ -300,18 +346,17 @@ void reflow_oven_cmd_decoder(char data[]) {
 			return;
 		}
 	}
-}
+}*/
 
-/*
- * Function:  reflow_oven_timer
- * --------------------
+/**
+ *  Function:  reflow_oven_timer
  *
  *  PUT THIS CODE IN THE TC3_Handler() FUNCTION IN YOUR MAIN.C FILE
  *  Handles the increment of every second.
  *	After a count of 20, increment rfl_ovn_time by 1
  *
  *  returns: null
- */
+ **/
 void reflow_oven_timer() {
 
 	if(rfl_ovn_time_tmp >= 19) {	//Assuming FCLKD = 1MHz clock, if not then change!
@@ -332,7 +377,6 @@ void reflow_oven_set_timer() {
 
 /*
  * Function:  reflow_oven_reset_timer
- * --------------------
  *
  *  Turn off timer, reset the tc count and the reflow oven count
  *
@@ -344,19 +388,18 @@ void reflow_oven_reset_timer() {
 	rfl_ovn_time = 0;
 }
 
-inline void reflow_oven_start_timer() {
+void reflow_oven_start_timer(void) {
 	tc_en(TC3_REG, ON);
 }
 
-/*
+/**
  * Function:  reflow_oven_reset_timer
- * --------------------
  *
  *  Turn off oven and wait until turned back on.  If you want to reset the system then use the reset button
  *  This is more of pause then a real turn off of the system
  *
  *  returns: null
- */
+ **/
 void reflow_oven_turn_off() {
 	
 	while(!gpio_read(PORTA_REG, PIN5)) {	//TODO: Test to make sure nested interrupts are acceptable.  If not then rethink this function

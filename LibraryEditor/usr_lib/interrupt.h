@@ -9,7 +9,6 @@
 #ifndef INTERRUPT_H_
 #define INTERRUPT_H_
 
-#include "stdint-gcc.h"
 #include "samd21.h"
 
 //Need to set to 1 to enable interrupt

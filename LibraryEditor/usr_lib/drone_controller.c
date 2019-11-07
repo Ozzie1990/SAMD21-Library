@@ -78,44 +78,57 @@ void initialize_drone() {
 	drone_plant_y_output = 0;
 }
 
-/**************************************************
-*	Function Name :  Set Motor 1 Speed
-*
-***************************************************/
+/**
+ * Set Motor Speed
+ *
+ *  Set the speed of motor 1
+ *
+ *  returns: null
+ **/
 void setMotor1Speed(uint16_t speed) {
 	pwm_set_duty_cycle(TC4_REG, speed);
 }
 
-/**************************************************
-*	Function Name :  Set Motor 2 Speed
-*
-***************************************************/
+/**
+ * Set Motor Speed
+ *
+ *  Set the speed of motor 2
+ *
+ *  returns: null
+ **/
 void setMotor2Speed(uint16_t speed) {
 	pwm_set_duty_cycle(TC5_REG, speed);
 }
 
-/**************************************************
-*	Function Name :  Set Motor 3 Speed
-*
-***************************************************/
+/**
+ * Set Motor Speed
+ *
+ *  Set the speed of motor 3
+ *
+ *  returns: null
+ **/
 void setMotor3Speed(uint16_t speed) {
 	pwm_set_duty_cycle(TC3_REG, speed);
 }
 
-/**************************************************
-*	Function Name :  Set Motor 4 Speed
-*
-***************************************************/
+/**
+ * Set Motor Speed
+ *
+ *  Set the speed of motor 4
+ *
+ *  returns: null
+ **/
 void setMotor4Speed(uint16_t speed) {
 	pwm_set_duty_cycle(TC7_REG, speed);
 }
 
-/**************************************************
-*	Function Name :  Auto Stabilizer
-*
-*   Description :	For Testing
-*
-***************************************************/
+/**
+ * Drone Stabilizer
+ *
+ *  For Testing, auto stabilize the drone to be at a resting position
+ *
+ *  returns: null
+ **/
 void drone_auto_stabilizer() {
 
 	while(1) {
@@ -126,23 +139,25 @@ void drone_auto_stabilizer() {
 	}
 }
 
-/**************************************************
-*	Function Name :  Derivative Function
-*
-*   Description :	For PID
-*
-***************************************************/
+/**
+ *  Differential Function
+ *
+ *  Calculate differential signal for PID
+ *
+ *  returns: int
+ **/
 int diff_accel(int diff_in) {
 	diff_accel_val = (diff_in - delay);
 	return diff_accel_val;
 }
 
-/**************************************************
-*	Function Name :  Integral Function
-*
-*   Description :	For PID
-*
-***************************************************/
+/**
+ *  Integral Function
+ *
+ *  Calculate integral signal for PID
+ *
+ *  returns: int
+ **/
 int int_accel(int int_in) {
 	int_accel_val = int_accel_val + (int_in - delay);
 	return diff_accel_val;
@@ -161,29 +176,29 @@ int PID_Handler(int diffGain, int intGain, int propGain, int PID_In) {
 	return data;
 }
 
-/**************************************************
-*	Function Name :  X Axis System
+/**
+*	X Axis System
 *
-*   Description :	Provide user input to system and subtract it from the previous plant output to then 
-*					be used by the setPlant function for use in the PID/Plant model
+*   Takes the desired position (i.e. input) and passes it through a closed loop system via a PID controller.  
+*   Reads the position of the drone via an accelerometer and provides that data back as negative feedback.
 *
-*   Visual:   _______							  _____	  _______		  ________
-*			  |INPUT| ---- (+)---[systempInput]---|PID|---|PLANT|--o-----|POSITION|
-*							|(-)								   |
-*						    |									   |
-*							|---[drone_plant_x_output]-------------|
+*..._______							    _____	_______		    ________
+*...|INPUT| ---- (+)---[systempInput]---|PID|---|PLANT|--o-----|POSITION|
+*.................|(-)								     |
+*.................|									     |
+*.................|---[drone_plant_x_output]-------------|
 *
-***************************************************/
+**/
 void drone_x_system(int input) {
 	int systemInput = input - drone_plant_x_output;
 	drone_plant_x_output = setPlant(X_AXIS, systemInput, pidXDiffGain, pidXIntGain, pidXPropGain);
 }
 
-/**************************************************
-*	Function Name :  Y Axis System
+/**
+*	Y Axis System
 *
-*   Description :	Provide user input to system and subtract it from the previous plant output to then 
-*					be used by the setPlant function for use in the PID/Plant model
+*   Takes the desired position (i.e. input) and passes it through a closed loop system via a PID controller.  
+*   Reads the position of the drone via an accelerometer and provides that data back as negative feedback.
 *
 ***************************************************/
 void drone_y_system(int input) {
@@ -191,13 +206,13 @@ void drone_y_system(int input) {
 	drone_plant_y_output = setPlant(Y_AXIS, systemInput, pidYDiffGain, pidYIntGain, pidYPropGain);
 }
 
-/**************************************************
+/**
 *	Function Name :  Plant Model
 *
-*   Description :	Take input (speed) and adjust the PWM speed given this input.  Update speed
-*					variables to be used later and provide axis accelerometer data.
+*   Take input (speed) and adjust the PWM speed given this input.  Update speed
+*	variables to be used later and provide axis accelerometer data.
 *
-***************************************************/
+**/
 int plant(int axis, int input) {
 	
 	int tSpeed = input;
@@ -545,6 +560,8 @@ int accel_cmd(int addr, int cmd) {
 	
 	//Send stop command
 	i2c_set_cmd(I2C0_REG, I2C_CMD_STOP);
+    
+    return ACCEL_READ_COMPLETE;
 }
 
 //I2C0_REG->CNTRLB.bits.QCEN = 1;

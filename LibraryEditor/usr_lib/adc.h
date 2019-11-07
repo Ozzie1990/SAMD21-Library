@@ -9,7 +9,7 @@
 #ifndef ADC_H_
 #define ADC_H_
 
-#include "stdint-gcc.h"
+#include "samd21.h"
 #include "clock.h"
 #include "pm.h"
 

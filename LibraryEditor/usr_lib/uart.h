@@ -14,7 +14,6 @@
 #include "samd21.h"
 #include "UART.h"
 #include "gpio.h"
-#include "stdint-gcc.h"
 #include "interrupt.h"
 
 typedef union {
@@ -179,10 +178,10 @@ int uart_rx_interrupt_handler(UART_REG * reg, uint8_t echo);
 void uart_quick_en();
 
 //New Code to Replace Old
-t_uart_reg * uart_get_reg(int comm_port, t_pin_info rx, t_pin_info tx);
-void uart_en(t_uart_reg * uart);
-void uart_dis(t_uart_reg * uart);
-t_pin_info uart_rx_pin();
-t_pin_info uart_tx_pin();
+t_uart_reg * uartGetReg(int comm_port, t_pin_info rx, t_pin_info tx);
+void uartEnable(t_uart_reg * uart);
+void uartDisable(t_uart_reg * uart);
+t_pin_info uartRxPin();
+t_pin_info uartTxPin();
 
 #endif /* UART_H_ */

@@ -12,7 +12,6 @@
 #include "samd21.h"
 #include "gpio.h"
 #include "clock.h"
-#include "stdint-gcc.h"
 #include "pm.h"
 
 typedef union {

@@ -90,8 +90,13 @@ void reflow_oven_check_user_input();
 void reflow_oven_timer();
 void reflow_oven_set_timer();
 void reflow_oven_reset_timer();
-inline void reflow_oven_start_timer();
+void reflow_oven_start_timer(void);
 void reflow_oven_turn_off();
 void reflow_oven_toggle_heater();
+
+void reflowOvenZone1(void);
+void reflowOvenZone2(void);
+void reflowOvenZone3(void);
+void reflowOvenZone4(void);
 
 #endif /* REFLOW_OVEN_H_ */

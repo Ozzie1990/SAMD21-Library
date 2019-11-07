@@ -13,7 +13,6 @@
 #include "gpio.h"
 #include "pm.h"
 #include "samd21.h"
-#include "stdint-gcc.h"
 
 #define ACK_RCVD		0
 #define ACK_NOT_RCVD	1

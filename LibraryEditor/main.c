@@ -51,6 +51,7 @@ int main(void)
 	volatile int a = 0;
 
     /* Replace with your application code */
+    
     while (1) 
     {
 		if(count >= 5 && state == 1) {

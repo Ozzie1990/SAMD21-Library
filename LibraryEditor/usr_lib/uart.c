@@ -137,7 +137,7 @@ void uart_initialize(UART_PARAMETERS uart) {
 }
 
 int uart_send_data_echo(UART_REG * reg, uint8_t data) {
-	
+    return 0;
 }
 
 //Checks the received data, if ECHO is enabled then send data back
@@ -229,14 +229,15 @@ void uart_quick_en() {
 	uart_enable(0);
 }
 
-/*
-*	Function: uart_get_reg
-*	
-*	Description:  returns a pre-configured uart register for use by the user 
-*   
-*/
+/**
+ * Function:  uartGetReg
+ *
+ *  Provides the user with a pre-configured uart register
+ *
+ *  returns: t_uart_reg *
+ **/
 
-t_uart_reg * uart_get_reg(int comm_port, t_pin_info rx, t_pin_info tx) {
+t_uart_reg * uartGetReg(int comm_port, t_pin_info rx, t_pin_info tx) {
 	
 	t_uart_reg * uart;
 	
@@ -276,12 +277,12 @@ t_uart_reg * uart_get_reg(int comm_port, t_pin_info rx, t_pin_info tx) {
 			break;
 			
 		default:
-			return;	//ERROR
+			return uart;	//ERROR
 	}
 	
 	//Set GPIO MUX for UART use
-	gpio_set_mux(tx.port, tx.pin, tx.perh, MUX_INPUT_ENABLE, MUX_PULLUP_ENABLE, MUX_DRV_NORMAL);
-	gpio_set_mux(rx.port, rx.pin, rx.perh, MUX_INPUT_ENABLE, MUX_PULLUP_ENABLE, MUX_DRV_NORMAL);
+	gpio_set_mux(tx.port, tx.pin, tx.perph, MUX_INPUT_ENABLE, MUX_PULLUP_ENABLE, MUX_DRV_NORMAL);
+	gpio_set_mux(rx.port, rx.pin, rx.perph, MUX_INPUT_ENABLE, MUX_PULLUP_ENABLE, MUX_DRV_NORMAL);
 	
 	//Enable clock 
 	GCLK_REG->CLKCNTRL.bits.CLKEN = 1;
@@ -302,30 +303,58 @@ t_uart_reg * uart_get_reg(int comm_port, t_pin_info rx, t_pin_info tx) {
 	return uart;
 }
 
-void uart_en(t_uart_reg * uart) {
+/**
+ * Function:  uartEnable
+ *
+ *  Enables the UART
+ *
+ *  returns: null
+ **/
+void uartEnable(t_uart_reg * uart) {
 	uart->CNTRLA.bits.EN = 1;
 }
 
-void uart_dis(t_uart_reg * uart) {
+/**
+ * Function:  uartDisable
+ *
+ *  Disables the UART
+ *
+ *  returns: null
+ **/
+void uartDisable(t_uart_reg * uart) {
 	uart->CNTRLA.bits.EN = 0;
 }
 
-t_pin_info uart_rx_pin() {
+/**
+ * Function:  uartRxPin
+ *
+ *  Provides the user with default RX pin information
+ *
+ *  returns: t_pin_info
+ **/
+t_pin_info uartRxPin() {
 	t_pin_info rx;
 	
 	rx.port = PORTA_REG;
 	rx.pin = PIN23;
-	rx.perh = PERPHC;
+	rx.perph = PERPHC;
 	
 	return rx;	
 }
 
-t_pin_info uart_tx_pin() {
+/**
+ * Function:  uartTxPin
+ *
+ *  Provides the user with default TX pin information
+ *
+ *  returns: t_pin_info
+ **/
+t_pin_info uartTxPin() {
 	t_pin_info tx;
 	
 	tx.port = PORTA_REG;
 	tx.pin = PIN22;
-	tx.perh - PERPHC;
+	tx.perph = PERPHC;
 	
 	return tx;
 }

@@ -1,0 +1,340 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"rfl",
+				"rfl_ovn_states_t\trfl_ovn_states_t"
+			],
+			[
+				"GCLK",
+				"GCLK_REG"
+			],
+			[
+				"GC",
+				"GCLK_REG"
+			],
+			[
+				"gpio_",
+				"gpio_set_dir"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "LibraryEditor/usr_lib/gpio.h",
+			"settings":
+			{
+				"buffer_size": 3189,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"contents": "/*\n * gpio.c\n *\n * Created: 8/25/2017 9:05:00 AM\n *  Author: ozzie\n */ \n\n#include \"gpio.h\"\n\nvoid gpio_set_dir(PORT_REG * port, int pin, int dir) {\n\tif(dir == DIROUT) {\n\t\tport->DIR.reg |= pin;\n\t} else {\n\t\tport->DIR.reg &= !pin;\n\t}\n    \n}\n\n//Need to fix this code, idea is ok but Assembly conversion makes it turn off/on all LEDs?  Might be an\n//anomaly due to a bad/damaged chip.\nvoid gpio_set_out(PORT_REG * port, int pin, int data) {\n\tif(data == 0) {\n\t\tport->OUT.reg &= !pin;\n\t} else {\n\t\tport->OUT.reg |= pin;\n\t}\n    \n    \n}\n\nvoid gpio_toggle(PORT_REG * port, int pin) {\n\tport->OUTTGL |= pin;\n}\n\n/**************************************************\n*\tFunction Name : GPIO SET MUX\n*\n*\tDescription : Set GPIO MUX ports, cannot set\n*\t\tmultiple pins at the same time. Pin must be passed with the (1<<x) format\n*\n***************************************************/\nvoid gpio_set_mux(PORT_REG * port, int pin, int perph, int input_enable, int pullup, int drive_strength) {\n\t\n\tpin = convert_pin_number(pin);\t//Configure pin to proper format\n\t\n\tif(pin%2 == 0) {\n\t\tport->PINMUX[pin/2].bits.PMUXE = perph;\n\t} else {\n\t\tport->PINMUX[pin/2].bits.PMUXO = perph;\n\t}\n\t\n\tport->PINCFG[pin].bits.PMUXEN = 1;\n\tport->PINCFG[pin].bits.INEN = input_enable;\n\tport->PINCFG[pin].bits.DVRSTR = drive_strength;\n\tport->PINCFG[pin].bits.PULLEN = pullup;\n}\n\n/**************************************************\n*\tFunction Name : GPIO SET MUX FAST\n*\n*\tDescription : Set GPIO MUX ports, cannot set\n*\t\tmultiple pins at the same time. Used without GPIO conversion\n*\t\tPins must be defined by basic integers (PIN3 = int 3, not 0b1000)\n*\n***************************************************/\nvoid gpio_set_mux_fast(PORT_REG * port, pin_t pin, int perph, int input_enable, int pullup, int drive_strength) {\n\t\n\tif(pin%2 == 0) {\n\t\tport->PINMUX[pin/2].bits.PMUXE = perph;\n\t\t} else {\n\t\tport->PINMUX[pin/2].bits.PMUXO = perph;\n\t}\n\t\n\tport->PINCFG[pin].bits.PMUXEN = 1;\n\tport->PINCFG[pin].bits.INEN = input_enable;\n\tport->PINCFG[pin].bits.DVRSTR = drive_strength;\n\tport->PINCFG[pin].bits.PULLEN = pullup;\n}\n\n//REDO\nvoid gpio_mux_disable(PORT_REG * port, int pin) {\n\tpin = convert_pin_number(pin);\n\tport->PINCFG[pin].bits.PMUXEN = 0;\n}\n\n//REDO\nint gpio_read(PORT_REG * port, int pin) {\n\tif((port->IN & pin) == 0) {\n\t\treturn 0;\n\t} \n\treturn 1;\n}\n\n//REMOVE\nvoid led_initialize() {\n\tgpio_set_dir(PORTB_REG, PIN30, DIROUT);\n}\n\n//REMOVE\nvoid led_toggle() {\n\tgpio_toggle(PORTB_REG, PIN30);\n}\n\nvoid usart3_pad01_set() {\n\tPORTA_REG->PINMUX[11].bits.PMUXE = PERPHC;\n\tPORTA_REG->PINMUX[11].bits.PMUXO = PERPHC;\n\tPORTA_REG->PINCFG[22].bits.PMUXEN = 1;\n\tPORTA_REG->PINCFG[22].bits.INEN = 1;\n\tPORTA_REG->PINCFG[23].bits.PMUXEN = 1;\n\tPORTA_REG->PINCFG[23].bits.INEN = 1;\n}\n\nvoid spi0_set() {\n\tPORTA_REG->PINMUX[2].bits.PMUXE = PERPHC;\n\tPORTA_REG->PINMUX[2].bits.PMUXO = PERPHC;\n\tPORTA_REG->PINMUX[3].bits.PMUXE = PERPHC;\n\tPORTA_REG->PINMUX[3].bits.PMUXO = PERPHC;\n\tPORTA_REG->PINCFG[4].bits.PMUXEN = 1;\n\tPORTA_REG->PINCFG[4].bits.INEN = 1;\n\tPORTA_REG->PINCFG[5].bits.PMUXEN = 1;\n\tPORTA_REG->PINCFG[5].bits.INEN = 1;\n\tPORTA_REG->PINCFG[6].bits.PMUXEN = 1;\n\tPORTA_REG->PINCFG[6].bits.INEN = 1;\n\tPORTA_REG->PINCFG[7].bits.PMUXEN = 1;\n\tPORTA_REG->PINCFG[7].bits.INEN = 1;\n}\n\n/**\n * Function:  gpioSetMux\n *\n *  Set the GPIO Mux\n *\n *  returns: null\n **/\nvoid gpioSetMux(t_pin_info pin) {\n    \n    if(pin.pin > 31) {\n        return; //Error checker\n    }\n    \n    //Different register for even or odd pin numbers\n    if(pin.pin/2 == 0) {\n        pin.port->PINMUX[pin.pin/2].bits.PMUXE = pin.perph;\n    } else {\n        pin.port->PINMUX[pin.pin/2].bits.PMUXO = pin.perph;\n    }\n    \n    //Set rest of mux data\n    pin.port->PINCFG[pin.pin].bits.PMUXEN = 1;\n    pin.port->PINCFG[pin.pin].bits.INEN = pin.inputEnable;\n    pin.port->PINCFG[pin.pin].bits.DVRSTR = pin.driveStrength;\n    pin.port->PINCFG[pin.pin].bits.PULLEN = pin.pullup;\n}\n\n/**\n * Function:  gpioGetPin\n *\n *  Return a default value for a pin given the port, pin number and peripheral\n *\n *  Example getPin(PORTA_REG, 18, PERPHC);\n *\n *  returns: t_pin_info\n **/\nt_pin_info gpioGetPin(PORT_REG * port, int pin, uint8_t perph) {\n    \n    t_pin_info tPin;\n    \n    tPin.port = port;\n    tPin.pin = pin;\n    tPin.perph = perph;\n    tPin.inputEnable = MUX_INPUT_ENABLE;\n    tPin.pullup = MUX_PULLUP_ENABLE;\n    tPin.driveStrength = MUX_DRV_NORMAL;\n    \n    return tPin;\n}\n\n/**\n * Function:  gpioDisablePullup\n *\n *  Disable pin pullup resistor\n *\n *  returns: t_pin_info\n **/\nt_pin_info * gpioDisablePullup(t_pin_info * pin) {\n    pin->pullup = MUX_PULLUP_DISABLE;\n    pin->\n    return pin;\n}\n\n/**\n * Function:  gpioEnablePullup\n *\n *  Enable pin pullup resistor\n *\n *  returns: t_pin_info\n **/\nt_pin_info * gpioEnablePullup(t_pin_info * pin) {\n    pin->pullup = MUX_PULLUP_ENABLE;\n    return pin;\n}\n\n",
+			"file": "LibraryEditor/usr_lib/gpio.c",
+			"file_size": 4983,
+			"file_write_time": 132141931315307447,
+			"settings":
+			{
+				"buffer_size": 4792,
+				"line_ending": "Windows"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+		[
+			[
+				[
+					"Packages/C++/C Single File.sublime-build",
+					""
+				],
+				[
+					"Packages/C++/C Single File.sublime-build",
+					"Run"
+				]
+			],
+			[
+				"Packages/C++/C Single File.sublime-build",
+				""
+			]
+		]
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"instal",
+				"Package Control: Install Package"
+			],
+			[
+				"remove",
+				"Package Control: Remove Package"
+			],
+			[
+				"dis",
+				"Package Control: Disable Package"
+			],
+			[
+				"enable",
+				"Package Control: Enable Package"
+			],
+			[
+				"disab",
+				"Package Control: Disable Package"
+			],
+			[
+				"package control",
+				"Package Control: Disable Package"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"instl",
+				"Package Control: Install Package"
+			],
+			[
+				"package",
+				"Package Control: List Packages"
+			],
+			[
+				"pckage",
+				"Package Control: Install Package"
+			],
+			[
+				"pack",
+				"View Package File"
+			]
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 137.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/Users/oswaldogonzalez/OneDrive/Documents/Code/SAMD21-Library",
+		"/Users/oswaldogonzalez/OneDrive/Documents/Code/SAMD21-Library/LibraryEditor",
+		"/Users/oswaldogonzalez/OneDrive/Documents/Code/SAMD21-Library/LibraryEditor/usr_lib"
+	],
+	"file_history":
+	[
+		"/Users/oswaldogonzalez/OneDrive/Documents/Code/SAMD21-Library/LibraryEditor/usr_lib/gpio.c",
+		"/Users/oswaldogonzalez/OneDrive/Documents/Code/SAMD21-Library/LibraryEditor/usr_lib/i2c.c",
+		"/Users/oswaldogonzalez/Library/Application Support/Sublime Text 3/Packages/ClangAutoComplete/ClangAutoComplete.sublime-settings",
+		"/Users/oswaldogonzalez/OneDrive/Documents/Code/SAMD21-Library/LibraryEditor/usr_lib/reflow_oven.c",
+		"/Users/oswaldogonzalez/OneDrive/Documents/Code/SAMD21-Library/LibraryEditor/usr_lib/drone_controller.c",
+		"/Users/oswaldogonzalez/Library/Application Support/Sublime Text 3/Packages/C++/C.sublime-syntax",
+		"/Users/oswaldogonzalez/OneDrive/Documents/Code/SAMD21-Library/LibraryEditor/usr_lib/adc.h",
+		"/Users/oswaldogonzalez/Library/Developer/CoreSimulator/Devices/FA71147B-FD43-4835-99E3-4271B1196938/data/Containers/Data/Application/BAB50770-3776-4C52-8D62-3196CFF87B0E/Documents/Code/JavaScript/Test1/script.js",
+		"/Users/oswaldogonzalez/Library/Developer/CoreSimulator/Devices/FA71147B-FD43-4835-99E3-4271B1196938/data/Containers/Data/Application/BAB50770-3776-4C52-8D62-3196CFF87B0E/Documents/Code/JavaScript/Test1/test.html"
+	],
+	"find":
+	{
+		"height": 40.0
+	},
+	"find_in_files":
+	{
+		"height": 102.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 1,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "LibraryEditor/usr_lib/gpio.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3189,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2152,
+								2152
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1452.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "LibraryEditor/usr_lib/gpio.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4792,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3865,
+								3865
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 1916.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 108.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.mdpopups":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "Packages/C++/C Single File.sublime-build",
+	"project": "test.sublime-project",
+	"replace":
+	{
+		"height": 71.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 223.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

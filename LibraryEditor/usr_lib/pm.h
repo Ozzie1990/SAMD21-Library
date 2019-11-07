@@ -9,7 +9,6 @@
 #ifndef PM_H_
 #define PM_H_
 
-#include "stdint-gcc.h"
 #include "samd21.h"
 
 #define PM_SERCOM3 5

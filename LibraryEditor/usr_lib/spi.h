@@ -13,7 +13,6 @@
 #include "pm.h"
 #include "samd21.h"
 #include "sercom.h"
-#include "stdint-gcc.h"
 
 //void spi_initialize(SERCOM comm, SERCOM_REG reg);
 //void spi_en(SERCOM comm);

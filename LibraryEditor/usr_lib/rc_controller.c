@@ -9,6 +9,8 @@ void initRC() {
 	
 	//Initialize ADC
 	adc_init(GCLK0, 0, 0xA); //TODO: TEST IF THIS WORKS
+    
+    
 }
 
 //Quick Test, handles everything just run

@@ -73,11 +73,11 @@ void pwm_set_duty_cycle(TC_16bit_t * tc, uint16_t pwm_value) {
 	tc->CC0 = pwm_value;
 }
 
-void pwm_default(t_PWM_PARAMETERS param) {
+void pwmDefault(t_PWM_PARAMETERS param) {
 	pwm_init(param.tc_port, param.pin, param.perph, param.tc, param.clk_source, param.pwm_mode, param.run_stdby, param.duty_cycle);
 }
 
-t_PWM_PARAMETERS pwm_get_param() {
+t_PWM_PARAMETERS pwmGetParam(void) {
 	t_PWM_PARAMETERS parameters;
 	
 	parameters.clk_source = 0;
